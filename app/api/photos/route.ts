@@ -25,6 +25,26 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  try {
+    return await handlePost(req);
+  } catch (err) {
+    const e = err as Error & { cause?: unknown; statusCode?: unknown };
+    console.error('[photos] THREW', {
+      message: e?.message,
+      name: e?.name,
+      cause: e?.cause,
+      statusCode: e?.statusCode,
+      stack: e?.stack,
+      raw: JSON.stringify(err, Object.getOwnPropertyNames(err ?? {})),
+    });
+    return NextResponse.json(
+      { error: `threw: ${e?.message || e?.name || 'unknown error — see server log'}` },
+      { status: 500 },
+    );
+  }
+}
+
+async function handlePost(req: NextRequest) {
   if (!isUnlocked(req)) {
     return NextResponse.json({ error: 'locked' }, { status: 401 });
   }
