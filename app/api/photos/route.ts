@@ -82,27 +82,43 @@ async function handlePost(req: NextRequest) {
   const ext = type === 'image/png' ? 'png' : type === 'image/webp' ? 'webp' : 'jpg';
   const filename = `${Date.now()}-${randomUUID()}.${ext}`;
 
-  const sb = supabaseService();
   const buffer = Buffer.from(await file.arrayBuffer());
-  const { error: uploadError } = await sb.storage
-    .from(PHOTO_BUCKET)
-    .upload(filename, buffer, { contentType: type, upsert: false });
-  if (uploadError) {
-    // supabase StorageError often has extra fields beyond `message`
-    console.error('[photos] storage upload failed', {
-      message: uploadError.message,
-      name: uploadError.name,
-      cause: (uploadError as unknown as { cause?: unknown }).cause,
-      statusCode: (uploadError as unknown as { statusCode?: unknown }).statusCode,
-      raw: JSON.stringify(uploadError),
+  console.log('[photos] uploading', { filename, type, bytes: buffer.length });
+
+  // Bypass supabase-js storage client — hit the REST API directly so we can
+  // see the raw HTTP status + body on failure.
+  const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  const uploadRes = await fetch(
+    `${supaUrl}/storage/v1/object/${PHOTO_BUCKET}/${encodeURIComponent(filename)}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${serviceKey}`,
+        'Content-Type': type,
+        'x-upsert': 'false',
+      },
+      body: buffer,
+    },
+  );
+  if (!uploadRes.ok) {
+    const bodyText = await uploadRes.text();
+    console.error('[photos] storage HTTP', {
+      status: uploadRes.status,
+      statusText: uploadRes.statusText,
+      body: bodyText.slice(0, 500),
     });
-    const msg = uploadError.message || (uploadError.name ?? 'unknown storage error');
-    const hint = /not found|does not exist/i.test(msg)
-      ? `storage bucket "${PHOTO_BUCKET}" not found — create it in Supabase → Storage (public, see supabase/SETUP.md step 3)`
-      : msg;
+    const hint =
+      uploadRes.status === 404
+        ? `storage bucket "${PHOTO_BUCKET}" not found — create it in Supabase → Storage (public, see supabase/SETUP.md step 3)`
+        : uploadRes.status === 401 || uploadRes.status === 403
+          ? `auth rejected (${uploadRes.status}) — check SUPABASE_SERVICE_ROLE_KEY`
+          : `HTTP ${uploadRes.status}: ${bodyText.slice(0, 200)}`;
     return NextResponse.json({ error: `upload: ${hint}` }, { status: 500 });
   }
+  console.log('[photos] storage upload ok', { filename });
 
+  const sb = supabaseService();
   const { data: publicData } = sb.storage.from(PHOTO_BUCKET).getPublicUrl(filename);
   const url = publicData.publicUrl;
 
