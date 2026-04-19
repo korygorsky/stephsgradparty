@@ -2,8 +2,11 @@ export const EVENT_NAME = 'Stephanie';
 export const EVENT_TAGLINE_L1 = 'She put in the pressure —';
 export const EVENT_TAGLINE_L2 = "now let's release it together.";
 
-// When is the party? Used by Countdown.
+// When does the party start? Drives the countdown → party-time transition.
 export const EVENT_DATE_ISO = '2026-04-24T19:00:00-04:00';
+
+// When does the party end? After this, the section flips to a farewell.
+export const EVENT_END_ISO = '2026-04-24T21:00:00-04:00';
 
 // Human-readable date shown on the ticket stub.
 export const EVENT_DATE_LABEL = 'Friday, April 24 · 7PM - 9PM';
