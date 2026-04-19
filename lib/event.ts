@@ -6,7 +6,7 @@ export const EVENT_TAGLINE_L2 = "now let's release it together.";
 export const EVENT_DATE_ISO = '2026-04-24T19:00:00-04:00';
 
 // Human-readable date shown on the ticket stub.
-export const EVENT_DATE_LABEL = 'Friday, April 24 · 7 PM onward';
+export const EVENT_DATE_LABEL = 'Friday, April 24 · 7 PM - 9PM';
 export const VENUE = 'State & Main — on the patio';
 export const FOOTER_YEAR = 2026;
 
