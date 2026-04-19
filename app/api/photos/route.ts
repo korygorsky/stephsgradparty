@@ -45,28 +45,17 @@ export async function POST(req: NextRequest) {
 }
 
 async function handlePost(req: NextRequest) {
-  console.log('[photos] step: enter');
   if (!isUnlocked(req)) {
     return NextResponse.json({ error: 'locked' }, { status: 401 });
   }
-  console.log('[photos] step: unlocked ok');
 
   try {
     const rl = await rateLimit(getIp(req), 'photos', 3);
     if (!rl.ok) {
       return NextResponse.json({ error: 'rate limited' }, { status: 429 });
     }
-    console.log('[photos] step: rate-limit ok');
   } catch (err) {
-    const e = err as { message?: string; code?: string; details?: string; hint?: string };
-    console.error('[photos] rate-limit THREW', {
-      message: e?.message,
-      code: e?.code,
-      details: e?.details,
-      hint: e?.hint,
-      raw: JSON.stringify(err, Object.getOwnPropertyNames(err ?? {})),
-    });
-    // Fail-open so rate_log issues don't block the upload path while we diagnose.
+    console.error('[photos] rate-limit failed (continuing fail-open)', err);
   }
 
   let form: FormData;
@@ -75,7 +64,6 @@ async function handlePost(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: 'bad form' }, { status: 400 });
   }
-  console.log('[photos] step: formData parsed');
 
   const file = form.get('photo');
   if (!(file instanceof Blob)) {
@@ -100,10 +88,9 @@ async function handlePost(req: NextRequest) {
   const filename = `${Date.now()}-${randomUUID()}.${ext}`;
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  console.log('[photos] uploading', { filename, type, bytes: buffer.length });
 
-  // Bypass supabase-js storage client — hit the REST API directly so we can
-  // see the raw HTTP status + body on failure.
+  // Hit Storage REST directly — the supabase-js storage client was swallowing
+  // HTTP errors into an opaque { message: '' } object on failure.
   const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   const uploadRes = await fetch(
@@ -133,7 +120,6 @@ async function handlePost(req: NextRequest) {
           : `HTTP ${uploadRes.status}: ${bodyText.slice(0, 200)}`;
     return NextResponse.json({ error: `upload: ${hint}` }, { status: 500 });
   }
-  console.log('[photos] storage upload ok', { filename });
 
   const sb = supabaseService();
   const { data: publicData } = sb.storage.from(PHOTO_BUCKET).getPublicUrl(filename);
@@ -148,7 +134,11 @@ async function handlePost(req: NextRequest) {
   if (error) {
     console.error('[photos] db insert failed', error);
     await sb.storage.from(PHOTO_BUCKET).remove([filename]);
-    return NextResponse.json({ error: `db: ${error.message}` }, { status: 500 });
+    const hint =
+      error.code === 'PGRST002' || /schema cache/i.test(error.message)
+        ? 'Postgres tables not set up — run supabase/schema.sql in the Supabase SQL Editor'
+        : error.message;
+    return NextResponse.json({ error: `db: ${hint}` }, { status: 500 });
   }
   return NextResponse.json({ photo: data as Photo });
 }
