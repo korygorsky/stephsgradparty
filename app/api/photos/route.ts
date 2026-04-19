@@ -68,7 +68,12 @@ export async function POST(req: NextRequest) {
     .from(PHOTO_BUCKET)
     .upload(filename, arrayBuffer, { contentType: type, upsert: false });
   if (uploadError) {
-    return NextResponse.json({ error: uploadError.message }, { status: 500 });
+    console.error('[photos] storage upload failed', uploadError);
+    const hint =
+      /not found|does not exist/i.test(uploadError.message)
+        ? `storage bucket "${PHOTO_BUCKET}" not found — create it in Supabase → Storage (public, see supabase/SETUP.md step 3)`
+        : uploadError.message;
+    return NextResponse.json({ error: `upload: ${hint}` }, { status: 500 });
   }
 
   const { data: publicData } = sb.storage.from(PHOTO_BUCKET).getPublicUrl(filename);
@@ -81,8 +86,9 @@ export async function POST(req: NextRequest) {
     .select('*')
     .single();
   if (error) {
+    console.error('[photos] db insert failed', error);
     await sb.storage.from(PHOTO_BUCKET).remove([filename]);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: `db: ${error.message}` }, { status: 500 });
   }
   return NextResponse.json({ photo: data as Photo });
 }

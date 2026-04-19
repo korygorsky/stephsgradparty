@@ -91,7 +91,7 @@ export default function PhotoWallSection({ initial }: Props) {
       } else if (res.status === 429) {
         setError('slow down a sec — too many uploads');
       } else {
-        setError('upload failed. try again?');
+        setError(`upload failed: ${res.message}`);
       }
       setSubmitting(false);
       return;
