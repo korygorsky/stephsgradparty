@@ -1,6 +1,6 @@
 export const EVENT_NAME = 'Stephanie';
-export const EVENT_TAGLINE_L1 = 'She kneaded this degree —';
-export const EVENT_TAGLINE_L2 = "now let's help her un-knot.";
+export const EVENT_TAGLINE_L1 = "She's legally allowed to touch you now —";
+export const EVENT_TAGLINE_L2 = 'celebrate accordingly.';
 
 // When is the party? Used by Countdown.
 export const EVENT_DATE_ISO = '2026-04-24T19:00:00-04:00';
