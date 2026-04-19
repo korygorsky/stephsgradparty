@@ -11,7 +11,7 @@ export const VENUE = 'State & Main — on the patio';
 export const FOOTER_YEAR = 2026;
 
 export const ABOUT_FACTS: { label: string; val: string }[] = [
-  { label: 'The course', val: 'Registered Massage Therapy — 3000 hours' },
+  { label: 'The course', val: 'Registered Massage Therapy' },
   { label: 'Fun fact', val: 'Can locate your knots before you describe them' },
   { label: 'Next chapter', val: 'Hanging her own shingle, one body at a time' },
   { label: 'Age', val: '38 years of accumulated wisdom' },
