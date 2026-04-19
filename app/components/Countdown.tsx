@@ -7,14 +7,15 @@ import SectionWrap from './SectionWrap';
 
 export default function Countdown() {
   const target = new Date(EVENT_DATE_ISO).getTime();
-  const [now, setNow] = useState<number>(() => Date.now());
+  const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
+    setNow(Date.now());
     const i = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(i);
   }, []);
 
-  const diff = Math.max(0, target - now);
+  const diff = now === null ? 0 : Math.max(0, target - now);
   const d = Math.floor(diff / 86400000);
   const h = Math.floor((diff % 86400000) / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
@@ -42,6 +43,7 @@ export default function Countdown() {
           {units.map((u) => (
             <div key={u.l}>
               <div
+                suppressHydrationWarning
                 style={{
                   fontFamily: '"Caveat", cursive',
                   fontSize: 56,
@@ -49,7 +51,7 @@ export default function Countdown() {
                   lineHeight: 1,
                 }}
               >
-                {String(u.n).padStart(2, '0')}
+                {now === null ? '--' : String(u.n).padStart(2, '0')}
               </div>
               <div
                 style={{
