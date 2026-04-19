@@ -63,16 +63,23 @@ export async function POST(req: NextRequest) {
   const filename = `${Date.now()}-${randomUUID()}.${ext}`;
 
   const sb = supabaseService();
-  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(await file.arrayBuffer());
   const { error: uploadError } = await sb.storage
     .from(PHOTO_BUCKET)
-    .upload(filename, arrayBuffer, { contentType: type, upsert: false });
+    .upload(filename, buffer, { contentType: type, upsert: false });
   if (uploadError) {
-    console.error('[photos] storage upload failed', uploadError);
-    const hint =
-      /not found|does not exist/i.test(uploadError.message)
-        ? `storage bucket "${PHOTO_BUCKET}" not found — create it in Supabase → Storage (public, see supabase/SETUP.md step 3)`
-        : uploadError.message;
+    // supabase StorageError often has extra fields beyond `message`
+    console.error('[photos] storage upload failed', {
+      message: uploadError.message,
+      name: uploadError.name,
+      cause: (uploadError as unknown as { cause?: unknown }).cause,
+      statusCode: (uploadError as unknown as { statusCode?: unknown }).statusCode,
+      raw: JSON.stringify(uploadError),
+    });
+    const msg = uploadError.message || (uploadError.name ?? 'unknown storage error');
+    const hint = /not found|does not exist/i.test(msg)
+      ? `storage bucket "${PHOTO_BUCKET}" not found — create it in Supabase → Storage (public, see supabase/SETUP.md step 3)`
+      : msg;
     return NextResponse.json({ error: `upload: ${hint}` }, { status: 500 });
   }
 
