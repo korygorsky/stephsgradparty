@@ -45,12 +45,28 @@ export async function POST(req: NextRequest) {
 }
 
 async function handlePost(req: NextRequest) {
+  console.log('[photos] step: enter');
   if (!isUnlocked(req)) {
     return NextResponse.json({ error: 'locked' }, { status: 401 });
   }
-  const rl = await rateLimit(getIp(req), 'photos', 3);
-  if (!rl.ok) {
-    return NextResponse.json({ error: 'rate limited' }, { status: 429 });
+  console.log('[photos] step: unlocked ok');
+
+  try {
+    const rl = await rateLimit(getIp(req), 'photos', 3);
+    if (!rl.ok) {
+      return NextResponse.json({ error: 'rate limited' }, { status: 429 });
+    }
+    console.log('[photos] step: rate-limit ok');
+  } catch (err) {
+    const e = err as { message?: string; code?: string; details?: string; hint?: string };
+    console.error('[photos] rate-limit THREW', {
+      message: e?.message,
+      code: e?.code,
+      details: e?.details,
+      hint: e?.hint,
+      raw: JSON.stringify(err, Object.getOwnPropertyNames(err ?? {})),
+    });
+    // Fail-open so rate_log issues don't block the upload path while we diagnose.
   }
 
   let form: FormData;
@@ -59,6 +75,7 @@ async function handlePost(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: 'bad form' }, { status: 400 });
   }
+  console.log('[photos] step: formData parsed');
 
   const file = form.get('photo');
   if (!(file instanceof Blob)) {
