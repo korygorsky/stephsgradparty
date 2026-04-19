@@ -93,38 +93,40 @@ export default async function Image() {
           }}
         />
 
-        {/* GRAD 2026 stamp */}
+        {/* GRAD 2026 stamp — top-right corner, above the polaroid cluster */}
         <div
           style={{
             position: 'absolute',
-            top: 52,
-            right: 80,
+            top: 38,
+            right: 44,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '10px 18px',
+            padding: '8px 14px',
             border: `2.5px solid ${ACCENT_DARK}`,
             color: ACCENT_DARK,
             fontFamily: 'Courier Prime',
-            fontSize: 14,
+            fontSize: 12,
             letterSpacing: 3,
             textTransform: 'uppercase',
             lineHeight: 1.05,
             transform: 'rotate(8deg)',
+            background: 'rgba(250,247,240,0.92)',
           }}
         >
           <div>GRAD</div>
-          <div style={{ fontSize: 18, fontWeight: 700, marginTop: 2 }}>2026</div>
+          <div style={{ fontSize: 16, fontWeight: 700, marginTop: 2 }}>2026</div>
         </div>
 
-        {/* Left block: title + tagline */}
+        {/* Left block: title + tagline. Narrower so it never collides with
+            the polaroid cluster on the right. */}
         <div
           style={{
             position: 'absolute',
-            top: 60,
-            left: 70,
-            width: 640,
+            top: 58,
+            left: 60,
+            width: 580,
             display: 'flex',
             flexDirection: 'column',
           }}
@@ -132,7 +134,7 @@ export default async function Image() {
           <div
             style={{
               fontFamily: 'Courier Prime',
-              fontSize: 16,
+              fontSize: 15,
               letterSpacing: 5,
               textTransform: 'uppercase',
               color: INK_SOFT,
@@ -147,22 +149,22 @@ export default async function Image() {
               flexDirection: 'column',
               fontFamily: 'Caveat',
               fontWeight: 700,
-              fontSize: 168,
-              lineHeight: 0.88,
+              fontSize: 124,
+              lineHeight: 0.9,
               color: INK,
-              marginTop: 10,
+              marginTop: 8,
               transform: 'rotate(-1.5deg)',
               transformOrigin: 'left',
             }}
           >
             <div>{`${EVENT_NAME.split(/\s+/)[0]}'s`}</div>
-            <div style={{ color: ACCENT_DARK, marginTop: -10 }}>Grad Party</div>
+            <div style={{ color: ACCENT_DARK, marginTop: -6 }}>Grad Party</div>
           </div>
 
           {/* squiggle */}
-          <svg width="220" height="14" viewBox="0 0 220 14" style={{ marginTop: 26 }}>
+          <svg width="200" height="14" viewBox="0 0 200 14" style={{ marginTop: 20 }}>
             <path
-              d="M0 7 Q 18 0, 36 7 T 72 7 T 108 7 T 144 7 T 180 7 T 220 7"
+              d="M0 7 Q 16 0, 32 7 T 64 7 T 96 7 T 128 7 T 160 7 T 200 7"
               fill="none"
               stroke={INK}
               strokeWidth="2.5"
@@ -175,11 +177,11 @@ export default async function Image() {
               display: 'flex',
               flexDirection: 'column',
               fontFamily: 'Kalam',
-              fontSize: 28,
+              fontSize: 24,
               lineHeight: 1.35,
               color: INK,
-              marginTop: 24,
-              maxWidth: 560,
+              marginTop: 18,
+              maxWidth: 520,
             }}
           >
             <div>{EVENT_TAGLINE_L1}</div>
@@ -187,52 +189,54 @@ export default async function Image() {
           </div>
         </div>
 
-        {/* Right cluster: polaroids */}
+        {/* Right cluster: polaroids. Sized + positioned so (a) the title
+            never hits them, (b) the stamp stays visible above p1, and
+            (c) the bottom p3 doesn't overlap the foot stamp. */}
         <Polaroid
           emoji="🎓"
           caption="graduation day"
           gradient={`linear-gradient(135deg, ${ACCENT} 0%, ${ACCENT2} 100%)`}
-          width={240}
-          top={40}
-          right={260}
+          width={200}
+          top={118}
+          right={250}
           rotate={-7}
-          tape={{ side: 'left', offset: 30, rotate: -12, width: 80 }}
+          tape={{ side: 'left', offset: 26, rotate: -12, width: 72 }}
         />
         <Polaroid
           emoji="🥂"
           caption="cheers to that"
           gradient={`linear-gradient(135deg, ${ACCENT2} 0%, ${ACCENT} 100%)`}
-          width={230}
-          top={80}
-          right={40}
+          width={200}
+          top={150}
+          right={52}
           rotate={6}
-          tape={{ side: 'right', offset: 30, rotate: 10, width: 90 }}
+          tape={{ side: 'right', offset: 26, rotate: 10, width: 78 }}
         />
         <Polaroid
           emoji="💆"
           caption="RMT at last"
           gradient={`linear-gradient(135deg, #e8c9a5 0%, ${ACCENT_DARK} 100%)`}
           bg="#fffdf5"
-          width={260}
-          top={320}
-          right={150}
+          width={218}
+          top={360}
+          right={140}
           rotate={-2}
-          tape={{ side: 'center', offset: 0, rotate: 3, width: 70 }}
+          tape={{ side: 'center', offset: 0, rotate: 3, width: 66 }}
         />
 
         {/* Ticket stub */}
         <div
           style={{
             position: 'absolute',
-            bottom: 55,
-            left: 70,
+            bottom: 70,
+            left: 60,
             background: '#fff',
             border: `2.5px solid ${INK}`,
             borderRadius: 4,
-            padding: '16px 26px',
+            padding: '14px 24px',
             display: 'flex',
             alignItems: 'center',
-            gap: 20,
+            gap: 18,
             boxShadow: '4px 5px 0 rgba(0,0,0,0.12)',
             transform: 'rotate(-1deg)',
           }}
@@ -346,14 +350,14 @@ export default async function Image() {
           </div>
         </div>
 
-        {/* foot */}
+        {/* foot — bottom-center, clear of the bottom-right polaroid */}
         <div
           style={{
             position: 'absolute',
-            bottom: 32,
-            right: 60,
+            bottom: 30,
+            left: 520,
             fontFamily: 'Courier Prime',
-            fontSize: 14,
+            fontSize: 12,
             letterSpacing: 3,
             color: INK_SOFT,
             textTransform: 'uppercase',
