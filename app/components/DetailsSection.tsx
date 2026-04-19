@@ -17,9 +17,7 @@ export default function DetailsSection() {
           padding: '0 4px',
         }}
       >
-        Food &amp; drinks are à la carte — order whatever looks good, tell your server
-        you&apos;re with {EVENT_NAME}&apos;s party. The patio&apos;s ours for the night, so
-        linger.
+        The patio&apos;s ours til 9pm, so linger.
       </div>
     </SectionWrap>
   );
