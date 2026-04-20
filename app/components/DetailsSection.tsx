@@ -18,7 +18,7 @@ export default function DetailsSection() {
             fontSize: 22,
             fontWeight: 700,
             color: PALETTE.ink,
-            background: PALETTE.accent1,
+            background: PALETTE.accent,
             border: `2px solid ${PALETTE.ink}`,
             borderRadius: 999,
             padding: '6px 20px',
