@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { track } from '@vercel/analytics';
 import { PALETTE } from '@/lib/palette';
 import { MEMORY_PROMPTS } from '@/lib/event';
 import type { Memory } from '@/lib/types';
@@ -40,6 +41,7 @@ export default function MemorySection({ initial }: Props) {
       setSubmitting(false);
       return;
     }
+    track('memory_submitted', { prompt: picked || 'none' });
     setMemories((prev) => [res.data.memory, ...prev]);
     setText('');
     setAuthor('');
@@ -67,7 +69,10 @@ export default function MemorySection({ initial }: Props) {
           {MEMORY_PROMPTS.map((p, i) => (
             <div
               key={p}
-              onClick={() => setPicked(p)}
+              onClick={() => {
+                track('memory_prompt_picked', { prompt: p });
+                setPicked(p);
+              }}
               style={{
                 background: '#fff',
                 border: `1px solid ${PALETTE.ink}`,
@@ -99,7 +104,10 @@ export default function MemorySection({ initial }: Props) {
             </div>
           ))}
           <div
-            onClick={() => setPicked(null)}
+            onClick={() => {
+              track('memory_prompt_picked', { prompt: 'skip' });
+              setPicked(null);
+            }}
             style={{
               background: PALETTE.accent + '33',
               border: `2px dashed ${PALETTE.ink}`,

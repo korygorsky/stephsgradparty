@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { track } from '@vercel/analytics';
 import { PALETTE } from '@/lib/palette';
 import type { GuestbookEntry } from '@/lib/types';
 import SectionWrap from './SectionWrap';
@@ -47,6 +48,13 @@ export default function GuestBookSection({ initial }: Props) {
   const [msg, setMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const startedRef = useRef(false);
+  const trackStarted = () => {
+    if (!startedRef.current) {
+      startedRef.current = true;
+      track('guestbook_started');
+    }
+  };
 
   const sign = async () => {
     if (!msg.trim() || submitting) return;
@@ -67,6 +75,7 @@ export default function GuestBookSection({ initial }: Props) {
       setSubmitting(false);
       return;
     }
+    track('guestbook_signed', { hasName: name.trim().length > 0 });
     setEntries((prev) => [res.data.entry, ...prev]);
     setName('');
     setMsg('');
@@ -96,7 +105,10 @@ export default function GuestBookSection({ initial }: Props) {
           type="text"
           placeholder="your name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            trackStarted();
+            setName(e.target.value);
+          }}
           style={{
             ...inputStyle(),
             border: 'none',
@@ -111,7 +123,10 @@ export default function GuestBookSection({ initial }: Props) {
         <textarea
           placeholder="dear steph,"
           value={msg}
-          onChange={(e) => setMsg(e.target.value)}
+          onChange={(e) => {
+            trackStarted();
+            setMsg(e.target.value);
+          }}
           rows={4}
           style={{
             width: '100%',

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { track } from '@vercel/analytics';
 import { PALETTE } from '@/lib/palette';
 import Btn, { inputStyle } from './primitives/Btn';
 
@@ -33,12 +34,15 @@ export default function PassphraseGate({ onClose, onUnlocked }: Props) {
         body: JSON.stringify({ passphrase: value.trim() }),
       });
       if (!res.ok) {
+        track('passphrase_failed');
         setError('that word doesn\u2019t ring a bell. try again?');
         setSubmitting(false);
         return;
       }
+      track('passphrase_unlocked');
       onUnlocked();
     } catch {
+      track('passphrase_error');
       setError('something went sideways. try again.');
       setSubmitting(false);
     }

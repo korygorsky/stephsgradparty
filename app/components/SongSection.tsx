@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { track } from '@vercel/analytics';
 import { PALETTE } from '@/lib/palette';
 import type { Song } from '@/lib/types';
 import SectionWrap from './SectionWrap';
@@ -25,6 +26,13 @@ export default function SongSection({ initial }: Props) {
   const [requester, setRequester] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const startedRef = useRef(false);
+  const trackStarted = () => {
+    if (!startedRef.current) {
+      startedRef.current = true;
+      track('song_started');
+    }
+  };
 
   const add = async () => {
     if (!title.trim() || submitting) return;
@@ -46,6 +54,7 @@ export default function SongSection({ initial }: Props) {
       setSubmitting(false);
       return;
     }
+    track('song_added', { hasArtist: artist.trim().length > 0 });
     setSongs((prev) => [res.data.song, ...prev]);
     setTitle('');
     setArtist('');
@@ -69,21 +78,30 @@ export default function SongSection({ initial }: Props) {
           type="text"
           placeholder="song title"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            trackStarted();
+            setTitle(e.target.value);
+          }}
           style={inputStyle()}
         />
         <input
           type="text"
           placeholder="artist"
           value={artist}
-          onChange={(e) => setArtist(e.target.value)}
+          onChange={(e) => {
+            trackStarted();
+            setArtist(e.target.value);
+          }}
           style={{ ...inputStyle(), marginTop: 8 }}
         />
         <input
           type="text"
           placeholder="requested by"
           value={requester}
-          onChange={(e) => setRequester(e.target.value)}
+          onChange={(e) => {
+            trackStarted();
+            setRequester(e.target.value);
+          }}
           style={{ ...inputStyle(), marginTop: 8 }}
         />
         {error && (

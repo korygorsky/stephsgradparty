@@ -1,3 +1,6 @@
+'use client';
+
+import { track } from '@vercel/analytics';
 import { PALETTE } from '@/lib/palette';
 import { EVENT_NAME, EVENT_DATE_LABEL, VENUE } from '@/lib/event';
 import SectionWrap from './SectionWrap';
@@ -12,6 +15,7 @@ export default function DetailsSection() {
           href="https://maps.app.goo.gl/zrRcH6eQ8kqMZSfM8"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => track('directions_click')}
           style={{
             display: 'inline-block',
             fontFamily: '"Caveat", cursive',

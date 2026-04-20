@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { track } from '@vercel/analytics';
 import { PALETTE } from '@/lib/palette';
 import type { Photo } from '@/lib/types';
 import SectionWrap from './SectionWrap';
@@ -124,6 +125,7 @@ export default function PhotoWallSection({ initial }: Props) {
       setSubmitting(false);
       return;
     }
+    track('photo_published', { hasCaption: caption.trim().length > 0 });
     setPhotos((prev) => [res.data.photo, ...prev]);
     cancel();
     setSubmitting(false);
@@ -168,7 +170,14 @@ export default function PhotoWallSection({ initial }: Props) {
           >
             tap below to add it to the party wall
           </div>
-          <Btn onClick={() => fileRef.current?.click()}>📸 snap or pick a pic</Btn>
+          <Btn
+            onClick={() => {
+              track('photo_started');
+              fileRef.current?.click();
+            }}
+          >
+            📸 snap or pick a pic
+          </Btn>
           <input
             ref={fileRef}
             type="file"
