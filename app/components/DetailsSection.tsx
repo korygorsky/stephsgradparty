@@ -7,6 +7,29 @@ export default function DetailsSection() {
   return (
     <SectionWrap title="The Details" subtitle="here's what you need to know">
       <TicketStub name={EVENT_NAME} date={EVENT_DATE_LABEL} venue={VENUE} />
+      <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center' }}>
+        <a
+          href="https://maps.app.goo.gl/zrRcH6eQ8kqMZSfM8"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: 'inline-block',
+            fontFamily: '"Caveat", cursive',
+            fontSize: 22,
+            fontWeight: 700,
+            color: PALETTE.ink,
+            background: PALETTE.accent1,
+            border: `2px solid ${PALETTE.ink}`,
+            borderRadius: 999,
+            padding: '6px 20px',
+            textDecoration: 'none',
+            boxShadow: '2px 3px 0 rgba(0,0,0,0.12)',
+            transform: 'rotate(-1.5deg)',
+          }}
+        >
+          Get Directions →
+        </a>
+      </div>
       <div
         style={{
           marginTop: 16,
