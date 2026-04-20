@@ -46,6 +46,62 @@ export default function DetailsSection() {
       >
         The patio&apos;s ours til 9pm, so linger.
       </div>
+      <div
+        style={{
+          marginTop: 28,
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
+        <div
+          style={{
+            position: 'relative',
+            background: '#fff8c5',
+            border: `1px dashed ${PALETTE.ink}`,
+            padding: '18px 22px 16px',
+            maxWidth: 280,
+            boxShadow: '3px 4px 0 rgba(0,0,0,0.1)',
+            transform: 'rotate(-2deg)',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: -10,
+              left: '50%',
+              transform: 'translateX(-50%) rotate(3deg)',
+              width: 60,
+              height: 18,
+              background: PALETTE.tape,
+              border: '1px solid rgba(0,0,0,0.05)',
+            }}
+          />
+          <div
+            style={{
+              fontFamily: '"Caveat", cursive',
+              fontSize: 26,
+              fontWeight: 700,
+              color: PALETTE.ink,
+              lineHeight: 1.1,
+              textAlign: 'center',
+              marginBottom: 6,
+            }}
+          >
+            no gifts!
+          </div>
+          <div
+            style={{
+              fontFamily: '"Kalam", cursive',
+              fontSize: 14,
+              color: PALETTE.ink,
+              lineHeight: 1.5,
+              textAlign: 'center',
+            }}
+          >
+            the only <em>presents</em> should be your <em>presence</em> ✨
+          </div>
+        </div>
+      </div>
     </SectionWrap>
   );
 }
