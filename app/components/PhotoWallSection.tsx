@@ -34,10 +34,31 @@ export default function PhotoWallSection({ initial }: Props) {
 
   const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
+
+    const isHeic =
+      /\.(heic|heif)$/i.test(file.name) ||
+      /^image\/hei[cf]/i.test(file.type);
+    if (isHeic) {
+      setError(
+        'HEIC photos aren\'t supported — in iPhone Settings → Camera → Formats, pick "Most Compatible", or share the pic and it\'ll convert to JPEG.',
+      );
+      setUploading(true);
+      return;
+    }
+
     const reader = new FileReader();
+    reader.onerror = () => {
+      setError('could not read that file — try a different photo');
+      setUploading(true);
+    };
     reader.onload = (ev) => {
       const img = new Image();
+      img.onerror = () => {
+        setError('that photo format isn\'t supported here — try JPEG or PNG');
+        setUploading(true);
+      };
       img.onload = () => {
         const maxW = 800;
         const scale = Math.min(1, maxW / img.width);
@@ -45,11 +66,19 @@ export default function PhotoWallSection({ initial }: Props) {
         canvas.width = img.width * scale;
         canvas.height = img.height * scale;
         const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+        if (!ctx) {
+          setError('browser couldn\'t process that image');
+          setUploading(true);
+          return;
+        }
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         canvas.toBlob(
           (blob) => {
-            if (!blob) return;
+            if (!blob) {
+              setError('couldn\'t encode that image — try a different one');
+              setUploading(true);
+              return;
+            }
             setPendingBlob(blob);
             setPendingUrl(URL.createObjectURL(blob));
             setUploading(true);
@@ -61,7 +90,6 @@ export default function PhotoWallSection({ initial }: Props) {
       img.src = ev.target?.result as string;
     };
     reader.readAsDataURL(file);
-    e.target.value = '';
   };
 
   const cancel = () => {
@@ -210,7 +238,11 @@ export default function PhotoWallSection({ initial }: Props) {
             <Btn onClick={cancel} variant="ghost" style={{ flex: 1 }} disabled={submitting}>
               cancel
             </Btn>
-            <Btn onClick={publish} style={{ flex: 2 }} disabled={submitting}>
+            <Btn
+              onClick={publish}
+              style={{ flex: 2 }}
+              disabled={submitting || !pendingBlob}
+            >
               {submitting ? 'pinning…' : 'pin it up ↗'}
             </Btn>
           </div>
